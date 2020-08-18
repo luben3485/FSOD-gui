@@ -114,6 +114,93 @@ def query_im_preprocess(im_data, cfg):
     
     return query, im_info, gt_boxes, num_boxes
 
+def run_model(support_im_paths,query_path,cnt_shot,output_path_folder):
+    # support
+    # support_root_dir = 'datasets/supports'
+    # class_dir = 'horse'
+    # n_shot = 2
+    # im_paths = list(Path(os.path.join(support_root_dir, class_dir)).glob('*.jpg'))
+    CWD = os.getcwd()
+
+    print(support_im_paths)
+    n_shot = len(support_im_paths)
+    random.seed(0)
+    im_path_list = random.sample(support_im_paths, k=n_shot)
+    im_list = []
+    #fig = plt.figure(num=None, figsize=(8, 8), dpi=50, facecolor='w', edgecolor='k')
+    for i, im_path in enumerate(im_path_list):
+        im = Image.open(im_path)
+        im_list.append(np.asarray(im))
+    support_data = support_im_preprocess(im_list, cfg, 320, n_shot)
+
+    # query
+    im = np.asarray(Image.open(query_path))
+    im2show = im.copy()
+    query_data, im_info, gt_boxes, num_boxes = query_im_preprocess(im, cfg)
+
+    # prepare data
+    data = [query_data, im_info, gt_boxes, num_boxes, support_data]
+    im_data, im_info, num_boxes, gt_boxes, support_ims = prepare_variable()
+    with torch.no_grad():
+        im_data.resize_(data[0].size()).copy_(data[0])
+        im_info.resize_(data[1].size()).copy_(data[1])
+        gt_boxes.resize_(data[2].size()).copy_(data[2])
+        num_boxes.resize_(data[3].size()).copy_(data[3])
+        support_ims.resize_(data[4].size()).copy_(data[4])
+
+
+    # model
+    cfg_from_list(['ANCHOR_SCALES', '[4, 8, 16, 32]', 'ANCHOR_RATIOS', '[0.5,1,2]'])
+    model_dir = os.path.join(CWD, 'models/fsod_2w5s_20de/train/checkpoints')
+    load_path = os.path.join(model_dir,'faster_rcnn_{}_{}_{}.pth'.format(1, 23, 4136))
+
+    model = get_model('fsod', load_path, n_shot)
+
+    start_time = time.time()
+
+    rois, cls_prob, bbox_pred, \
+    rpn_loss_cls, rpn_loss_box, \
+    RCNN_loss_cls, RCNN_loss_bbox, \
+    rois_label = model(im_data, im_info, gt_boxes, num_boxes, support_ims, gt_boxes)
+
+    scores = cls_prob.data
+    boxes = rois.data[:, :, 1:5]
+    box_deltas = bbox_pred.data
+
+
+    if cfg.TRAIN.BBOX_NORMALIZE_TARGETS_PRECOMPUTED:
+    # Optionally normalize targets by a precomputed mean and stdev
+        box_deltas = box_deltas.view(-1, 4) * torch.FloatTensor(cfg.TRAIN.BBOX_NORMALIZE_STDS).cuda() \
+                + torch.FloatTensor(cfg.TRAIN.BBOX_NORMALIZE_MEANS).cuda()
+        box_deltas = box_deltas.view(1, -1, 4)
+
+    pred_boxes = bbox_transform_inv(boxes, box_deltas, 1)
+    pred_boxes = clip_boxes(pred_boxes, im_info.data, 1)
+
+    # re-scale boxes to the origin img scale
+    pred_boxes /= data[1][0][2].item()
+
+    scores = scores.squeeze()
+    pred_boxes = pred_boxes.squeeze()
+    thresh = 0.05
+    inds = torch.nonzero(scores[:,1]>thresh).view(-1)
+    cls_scores = scores[:,1][inds]
+    _, order = torch.sort(cls_scores, 0, True)
+    cls_boxes = pred_boxes[inds, :]
+    cls_dets = torch.cat((cls_boxes, cls_scores.unsqueeze(1)), 1)
+    cls_dets = cls_dets[order]
+    keep = nms(cls_boxes[order, :], cls_scores[order], cfg.TEST.NMS)
+    cls_dets = cls_dets[keep.view(-1).long()]
+
+    end_time = time.time()
+
+    im2show = vis_detections(im2show, ' ', cls_dets.cpu().numpy(), 0.5)
+
+    output_path = os.path.join(output_path_folder, 'result'+ str(cnt_shot) +'.jpg')
+    cv2.imwrite(output_path, im2show[:, :, ::-1])
+    print(cls_dets)
+    print(end_time - start_time)
+
 
 if __name__ == '__main__':
 
@@ -123,7 +210,7 @@ if __name__ == '__main__':
     # support
     support_root_dir = 'datasets/supports'
     class_dir = 'horse'
-    n_shot = 1
+    n_shot = 2
     im_paths = list(Path(os.path.join(support_root_dir, class_dir)).glob('*.jpg'))
     print(im_paths)
     random.seed(0)
@@ -132,7 +219,7 @@ if __name__ == '__main__':
     fig = plt.figure(num=None, figsize=(8, 8), dpi=50, facecolor='w', edgecolor='k')
     for i, im_path in enumerate(im_path_list):
         im = Image.open(im_path)
-        im_list.append(np.asarray(im))   
+        im_list.append(np.asarray(im))
     support_data = support_im_preprocess(im_list, cfg, 320, n_shot)
 
     # query
