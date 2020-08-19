@@ -152,7 +152,7 @@ def run_model(support_im_paths,query_path,cnt_shot,output_path_folder):
     # model
     cfg_from_list(['ANCHOR_SCALES', '[4, 8, 16, 32]', 'ANCHOR_RATIOS', '[0.5,1,2]'])
     model_dir = os.path.join(CWD, 'models/fsod_2w5s_20de/train/checkpoints')
-    load_path = os.path.join(model_dir,'faster_rcnn_{}_{}_{}.pth'.format(1, 23, 4136))
+    load_path = os.path.join(model_dir,'faster_rcnn_{}_{}_{}.pth'.format(1, 24, 4136))
 
     model = get_model('fsod', load_path, n_shot)
 

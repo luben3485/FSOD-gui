@@ -26,57 +26,65 @@
             <div class="col-xl-4">
                 <div class="previous">
                     <h3 class="text">Previous Stage</h3>
-                    {% if previous_img_path %}
-                    <img  src={{previous_img_path}} id="pre_query_img" height="500" width="500">
-                   {% else %}
-                   <img  src="static/img/black.jpg" id="pre_query_img" height="500" width="500">
-                   {% endif %}
+<!--                    {% if previous_img_path %}-->
+<!--                    <img  src={{previous_img_path}} id="pre_query_img" height="500" width="500">-->
+<!--                   {% else %}-->
+<!--                   <img  src="static/img/black.jpg" id="pre_query_img" height="500" width="500">-->
+<!--                   {% endif %}-->
+                    <img  src="static/img/black.jpg" id="pre_query_img" height="500" width="500">
                 </div>
             </div>
 
             <div class="col-xl-2">
-                <div id="pre_support">
-                    {% if previous_n_shot %}
-                    <h4>#Shot:{{previous_n_shot}}</h4>
-                    {% endif %}
+                <div id="pre_support_text"></div>
+                <div id="pre_support_img"></div>
 
-                    {%if previous_support_path_list%}
-                        {%for path in previous_support_path_list%}
-                            <img  src={{path}} class="pre_support_img" height="100" width="100">
-                        {% endfor %}
-                    {% endif%}
-                </div>
+
+<!--                    {% if previous_n_shot %}-->
+<!--                    <h4>#Shot:{{previous_n_shot}}</h4>-->
+<!--                    {% endif %}-->
+
+<!--                    {%if previous_support_path_list%}-->
+<!--                        {%for path in previous_support_path_list%}-->
+<!--                            <img  src={{path}} class="pre_support_img" height="100" width="100">-->
+<!--                        {% endfor %}-->
+<!--                    {% endif%}-->
+
             </div>
 
             <div class="col-xl-4">
                 <h3 class="text">Current Stage</h3>
-                {% if current_img_path %}
-                <img  src={{current_img_path}} id="cnt_query_img" height="500" width="500">
-                {% else %}
+<!--                {% if current_img_path %}-->
+<!--                <img  src={{current_img_path}} id="cnt_query_img" height="500" width="500">-->
+<!--                {% else %}-->
+<!--                <img  src="static/img/black.jpg" id="cnt_query_img" height="500" width="500">-->
+<!--                {% endif %}-->
                 <img  src="static/img/black.jpg" id="cnt_query_img" height="500" width="500">
-                {% endif %}
             </div>
 
             <div class="col-xl-2">
-                <div id="cnt_support">
-                    {% if current_n_shot %}
-                    <h4>#Shot:{{current_n_shot}}</h4>
-                    {% endif %}
+                <div id="cnt_support_text"></div>
+                <div id="cnt_support_img"></div>
+<!--                    {% if current_n_shot %}-->
+<!--                    <h4>#Shot:{{current_n_shot}}</h4>-->
+<!--                    {% endif %}-->
 
-                    {%if current_support_path_list%}
-                        {%for path in current_support_path_list%}
-                            <img  src={{path}} class="cnt_support_img" height="100" width="100">
-                        {% endfor %}
-                    {% endif%}
+<!--                    {%if current_support_path_list%}-->
+<!--                        {%for path in current_support_path_list%}-->
+<!--                            <img  src={{path}} class="cnt_support_img" height="100" width="100">-->
+<!--                        {% endfor %}-->
+<!--                    {% endif%}-->
 
-                </div>
+
             </div>
         </div>
 
         <div class="row justify-content-center" style="padding-top:8vh;">
             <div class="col-3">
-                <button class="button button-primary  button-block button-large" id="query_image">Take a photo (query image)</button>
-                <button class="button button-primary  button-block button-large" id="support_image">Add a shot (support image)</button>
+
+                <button class="button button-primary  button-block button-large" id="query_image" >Take a photo (query image)</button>
+                <button class="button button-primary  button-block button-large" id="support_image" >Add a shot (support image)</button>
+
             </div>
         </div>
         <div class="row">

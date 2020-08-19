@@ -41,6 +41,6 @@ img:not(#pre_query_img):not(#cnt_query_img){padding:10px;}
 button{
     width:30%;
 }
-#pre_support, #cnt_support{
+#pre_support_text, #cnt_support_text{
     margin-top:30%;
 }
