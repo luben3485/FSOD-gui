@@ -1,9 +1,13 @@
 $( document ).ready(function() {
+
     $( "#support_image" ).click(function() {
+
         $.ajax({
             url: '/support_image',
-            method: "GET",
+            method: "POST",
+            data:{'im':$('#shot_img').attr('src')}
         }).done(function (res){
+            $('#cameraModal').modal('hide')
             //$("body").html(res)
             $('#cnt_support_text').empty();
             $('#pre_support_text').empty();
@@ -38,6 +42,22 @@ $( document ).ready(function() {
             //_filename = 'static/img/horse02.jpg';
             //$(new Image(100,100)).attr('src', '' + _filename).appendTo($('#previous_support')).fadeIn();
         });
+    });
+
+    $( "#take_a_shot" ).click(function() {
+        //$(new Image(450,450)).attr('src', 'static/img/black.jpg').appendTo($('.modal-body')).fadeIn();
+        $.ajax({
+            url: '/take_a_shot',
+            method: "GET",
+        }).done(function (res){
+            $("#shot_img").attr("src","data:image/jpg;base64,"+res);
+            $('#cameraModal').modal('show')
+
+        });
+
+
+
+
     });
 
     $( "#query_image" ).click(function() {

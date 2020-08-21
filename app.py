@@ -3,9 +3,11 @@ from flask_caching import Cache
 
 import cv2
 import base64
-import run_one_im
+#import run_one_im
 from pathlib import Path
 import os
+import io
+from PIL import Image
 
 app = Flask(__name__)
 config = {
@@ -26,26 +28,38 @@ if app.config["DEBUG"]:
         return response
 
 cnt_shot = 0
-query_path = 'static/img/data/query01.jpg'
+query_path = 'static/img/data/query02.jpg'
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/support_image',methods=['POST','GET'])
+@app.route('/support_image',methods=['POST'])
 def support_image():
     global cnt_shot
-    #a =request.form.to_dict()
-    #print(a['number'])
-
-    support_root_dir = 'static/img/data/support'
-    class_dir = 'horse'
-
-    output_path_folder = 'static/img/data/result'
-    #support_im_paths = list(Path(os.path.join(support_root_dir, class_dir)).glob('*.jpg'))
     if cnt_shot < 5:
         cnt_shot += 1
     pre_shot  = cnt_shot -1
+
+    data = request.form.to_dict()
+    #print(data['im'])
+    im_b64 = data['im'].split(',')[1]
+    print(im_b64)
+    im_bytes = base64.b64decode(im_b64)
+    im = Image.open(io.BytesIO(im_bytes))
+
+    support_root_dir = 'static/img/data/support'
+    class_dir = 'test'
+    im_path = os.path.join(support_root_dir, class_dir,str(cnt_shot) + '.jpg')
+    im.save(im_path)
+    #cv2.imwrite(im_path, im)
+
+    #a =request.form.to_dict()
+    #print(a['number'])
+
+    output_path_folder = 'static/img/data/result'
+    #support_im_paths = list(Path(os.path.join(support_root_dir, class_dir)).glob('*.jpg'))
+
 
     cnt_support_im_paths = []
     for i in range(1,cnt_shot+1):
@@ -60,7 +74,7 @@ def support_image():
     #     current_support_path_list.append(str(path))
     # n_shot = len(current_support_path_list)
 
-    run_one_im.run_model(cnt_support_im_paths,query_path,cnt_shot,output_path_folder)
+    #run_one_im.run_model(cnt_support_im_paths,query_path,cnt_shot,output_path_folder)
     cnt_result_im_path = os.path.join(output_path_folder, 'result' + str(cnt_shot) + '.jpg')
     if pre_shot != 0:
         pre_result_im_path = os.path.join(output_path_folder, 'result' + str(pre_shot) + '.jpg')
@@ -94,6 +108,20 @@ def query_image():
     # im_b64 = base64.b64encode(im_bytes)
     # return im_b64
     return jsonify({'query_path':query_path})
+    # return render_template("index.html", current_img_path = query_path)
+
+@app.route('/take_a_shot',methods=['POST','GET'])
+def take_a_shot():
+    cam = cv2.VideoCapture(0)
+    ret, im = cam.read()
+    (flag, im_encode) = cv2.imencode(".jpg", im)
+    im_bytes = im_encode.tobytes()
+    im_b64 = base64.b64encode(im_bytes)
+    return im_b64
+
+    # global im
+    # im = cv2.imread('datasets/query/query_horse.jpg')
+    # return jsonify({'query_path':query_path})
     # return render_template("index.html", current_img_path = query_path)
 
 

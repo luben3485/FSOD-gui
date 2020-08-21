@@ -44,3 +44,6 @@ button{
 #pre_support_text, #cnt_support_text{
     margin-top:30%;
 }
+.modal-title{
+    color:black;
+}
