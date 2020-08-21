@@ -22,10 +22,7 @@ from model.utils.net_utils import vis_detections
 from roi_data_layer.roidb import combined_roidb
 
 from model.faster_rcnn.fsod import FSOD
-#from model.faster_rcnn.qkv import QKVRCNN
-#from model.faster_rcnn.faster_rcnn import FasterRCNN
-#from model.faster_rcnn.narpn import NARPN
-#from model.faster_rcnn.double_qkv import DoubleRCNN
+from model.faster_rcnn.multihead_attention import MultiheadAttentionRCNN
 
 
 def parse_args():
@@ -37,15 +34,8 @@ def parse_args():
 def get_model(net, load_path, n_shot):
     if net == 'fsod':
         model = FSOD(['bg', 'fg'], 50, pretrained=False, num_way=2, num_shot=n_shot)
-    elif net == 'qkv':
-        model = QKVRCNN(['bg', 'fg'], 50, pretrained=True, num_way=2, num_shot=n_shot, pos_encoding=True)
-    elif args.net == 'fasterrcnn':
-        imdb, roidb, ratio_list, ratio_index = combined_roidb('voc_2007_trainval')
-        model = FasterRCNN(imdb.classes, 50, pretrained=True)
-    elif args.net == 'narpn':
-        model = NARPN(['bg', 'fg'], 50, pretrained=True, num_way=2, num_shot=n_shot)
-    elif net == 'double':
-        model = DoubleRCNN(['bg', 'fg'], 50, pretrained=True, num_way=2, num_shot=n_shot, pos_encoding=True)
+    elif net == 'multi':
+        model = MultiheadAttentionRCNN(['f', 'g'], 1, pretrained=False, num_way=2, num_shot=n_shot)
     else:
         raise Exception('model undefined')
     model.create_architecture()
@@ -57,7 +47,7 @@ def get_model(net, load_path, n_shot):
     model.eval()
     cfg.CUDA = True
     model.cuda()
-    
+
     return model
 
 def prepare_variable():
@@ -81,6 +71,8 @@ def prepare_variable():
 
     return im_data, im_info, num_boxes, gt_boxes, support_ims
 
+
+
 def support_im_preprocess(im_list, cfg, support_im_size, n_of_shot):
     support_data_all = np.zeros((n_of_shot, 3, support_im_size, support_im_size), dtype=np.float32)
     for i, im in enumerate(im_list):
@@ -99,7 +91,7 @@ def support_im_preprocess(im_list, cfg, support_im_size, n_of_shot):
         h, w = im.shape[0], im.shape[1]
         support_data_all[i, :, :h, :w] = np.transpose(im, (2, 0, 1))
     support_data = torch.from_numpy(support_data_all).unsqueeze(0)
-    
+
     return support_data
 
 def query_im_preprocess(im_data, cfg):
@@ -111,7 +103,7 @@ def query_im_preprocess(im_data, cfg):
     gt_boxes = torch.from_numpy(np.array([0]))
     num_boxes = torch.from_numpy(np.array([0]))
     query = im_data.permute(2, 0, 1).contiguous().unsqueeze(0)
-    
+
     return query, im_info, gt_boxes, num_boxes
 
 def run_model(support_im_paths,query_path,cnt_shot,output_path_folder):
@@ -151,10 +143,10 @@ def run_model(support_im_paths,query_path,cnt_shot,output_path_folder):
 
     # model
     cfg_from_list(['ANCHOR_SCALES', '[4, 8, 16, 32]', 'ANCHOR_RATIOS', '[0.5,1,2]'])
-    model_dir = os.path.join(CWD, 'models/fsod_2w5s_20de/train/checkpoints')
-    load_path = os.path.join(model_dir,'faster_rcnn_{}_{}_{}.pth'.format(1, 24, 4136))
+    model_dir = os.path.join(CWD, 'models')
+    load_path = os.path.join(model_dir,'faster_rcnn_{}_{}_{}.pth'.format(1, 11, 34467))
 
-    model = get_model('fsod', load_path, n_shot)
+    model = get_model('multi', load_path, n_shot)
 
     start_time = time.time()
 
@@ -194,7 +186,7 @@ def run_model(support_im_paths,query_path,cnt_shot,output_path_folder):
 
     end_time = time.time()
 
-    im2show = vis_detections(im2show, ' ', cls_dets.cpu().numpy(), 0.5)
+    im2show = vis_detections(im2show, ' ', cls_dets.cpu().numpy(), 0.8)
 
     output_path = os.path.join(output_path_folder, 'result'+ str(cnt_shot) +'.jpg')
     cv2.imwrite(output_path, im2show[:, :, ::-1])
@@ -305,7 +297,7 @@ if __name__ == '__main__':
 
     end_time = time.time()
 
-    im2show = vis_detections(im2show, ' ', cls_dets.cpu().numpy(), 0.5)
+    im2show = vis_detections(im2show, ' ', cls_dets.cpu().numpy(), 0.85)
     output_path = os.path.join(CWD, 'output/visualization', 'tmp.jpg')
     cv2.imwrite(output_path, im2show[:, :, ::-1])
     # print(cls_dets.size())

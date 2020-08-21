@@ -1,24 +1,23 @@
 $( document ).ready(function() {
 
     $( "#support_image" ).click(function() {
-
         $.ajax({
             url: '/support_image',
             method: "POST",
-            data:{'im':$('#shot_img').attr('src')}
+            data:{'support_im':$('#shot_img').attr('src')}
         }).done(function (res){
             $('#cameraModal').modal('hide')
             //$("body").html(res)
             $('#cnt_support_text').empty();
             $('#pre_support_text').empty();
-            if(res.cnt_shot==5){
-                $( "#support_image").attr('disabled','disabled');
-            }
+             if(res.cnt_shot==10){
+                 $( "#support_image").attr('disabled','disabled');
+             }
             $('#cnt_support_text').append('<h4>#Shot: ' + res.cnt_shot + '</h4>');
             $("#cnt_query_img").attr("src",res.cnt_result_im_path);
             $(new Image(100,100)).attr('src', res.cnt_support_im_paths[res.cnt_shot-1]).appendTo($('#cnt_support_img')).fadeIn();
 
-            if(res.pre_shot != 0 && res.pre_shot<=4){
+            if(res.pre_shot != 0 && res.pre_shot<=9){
                 $('#pre_support_text').append('<h4>#Shot: ' + res.pre_shot + '</h4>');
                 $("#pre_query_img").attr("src",res.pre_result_im_path);
                 $(new Image(100,100)).attr('src', res.pre_support_im_paths[res.pre_shot-1]).appendTo($('#pre_support_img')).fadeIn();
@@ -73,7 +72,8 @@ $( document ).ready(function() {
             $('#pre_support_text').empty();
             $('#cnt_support_img').empty();
             $('#pre_support_img').empty();
-            $("#cnt_query_img").attr("src",res.query_path);
+            //$("#cnt_query_img").attr("src",res.query_path);
+            $("#cnt_query_img").attr("src","data:image/jpg;base64,"+res);
             $("#pre_query_img").attr("src","static/img/black.jpg");
 
 
