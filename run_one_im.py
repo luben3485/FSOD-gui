@@ -184,9 +184,15 @@ def run_model(support_im_paths,query_path,cnt_shot,output_path_folder):
     keep = nms(cls_boxes[order, :], cls_scores[order], cfg.TEST.NMS)
     cls_dets = cls_dets[keep.view(-1).long()]
 
+    for i in range(cls_dets.shape[0]):
+        w = cls_dets[i, 2] - cls_dets[i, 0]
+        h = cls_dets[i, 3] - cls_dets[i, 1]
+        if w > 0.5 * im2show.shape[1] or h > 0.5 * im2show.shape[0]:
+            cls_dets[i, 4] = 0 
+
     end_time = time.time()
 
-    im2show = vis_detections(im2show, ' ', cls_dets.cpu().numpy(), 0.8)
+    im2show = vis_detections(im2show, ' ', cls_dets.cpu().numpy(), 0.5)
 
     output_path = os.path.join(output_path_folder, 'result'+ str(cnt_shot) +'.jpg')
     cv2.imwrite(output_path, im2show[:, :, ::-1])
