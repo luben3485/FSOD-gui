@@ -7,7 +7,7 @@ $( document ).ready(function() {
             data:{'support_im':$('#shot_img').attr('src')}
         }).done(function (res){
             $('#cameraModal').modal('hide')
-            //$("body").html(res)
+
             $('#cnt_support_text').empty();
             $('#pre_support_text').empty();
              if(res.cnt_shot==10){
@@ -43,19 +43,24 @@ $( document ).ready(function() {
         });
     });
 
-    $( "#take_a_shot" ).click(function() {
-        //$(new Image(450,450)).attr('src', 'static/img/black.jpg').appendTo($('.modal-body')).fadeIn();
+    $( "#add_a_shot" ).click(function() {
         $.ajax({
-            url: '/take_a_shot',
-            method: "GET",
+            url: '/add_a_shot',
+            method: "POST",
         }).done(function (res){
-            $("#shot_img").attr("src","data:image/jpg;base64,"+res);
-            $('#cameraModal').modal('show')
+            //previous method
+            //$("#shot_img").attr("src","data:image/jpg;base64,"+res);
+
+            //for refresh image
+            $("#shot_img_1").attr("src","");
+            $("#shot_img_2").attr("src","");
+
+            //display support image
+            $("#shot_img_1").attr("src",res.shot_img_1);
+            $("#shot_img_2").attr("src",res.shot_img_2);
+            $('#cameraModal').modal('show');
 
         });
-
-
-
 
     });
 
@@ -64,23 +69,56 @@ $( document ).ready(function() {
             url: '/query_image',
             method: "GET",
         }).done(function (res) {
-            //$("body").html(res)
-            //$("#previous_img").attr("src","data:image/jpg;base64,"+data);
-            //$("#cnt_query_img").attr("src","data:image/jpg;base64,"+data);
             $("#support_image").removeAttr('disabled');
             $('#cnt_support_text').empty();
             $('#pre_support_text').empty();
             $('#cnt_support_img').empty();
             $('#pre_support_img').empty();
-            //$("#cnt_query_img").attr("src",res.query_path);
             $("#cnt_query_img").attr("src","data:image/jpg;base64,"+res);
             $("#pre_query_img").attr("src","static/img/black.jpg");
-
 
         });
     });
 
+    $( "#inference_model" ).click(function() {
+        $.ajax({
+            url: '/inference_model',
+            method: "POST",
+        }).done(function (res){
 
+        }
+            //empty the text div
+            $('#cnt_support_text').empty();
+            $('#pre_support_text').empty();
 
+            //current text & image
+            $('#cnt_support_text').append('<h4>#Shot: ' + res.cnt_shot + '</h4>');
+            $("#cnt_query_img").attr("src",res.cnt_result_im_path);
+            $(new Image(100,100)).attr('src', res.cnt_support_im_paths[res.cnt_shot-1]).appendTo($('#cnt_support_img')).fadeIn();
+
+            //previous text & image
+            if(res.pre_shot != 0){
+                $('#pre_support_text').append('<h4>#Shot: ' + res.pre_shot + '</h4>');
+                $('#pre_query_img').attr("src",res.pre_result_im_path);
+                $(new Image(100,100)).attr('src', res.pre_support_im_paths[res.pre_shot-1]).appendTo($('#pre_support_img')).fadeIn();
+            }
+
+        });
+
+    $( "#reset" ).click(function() {
+        $('#cnt_support_text').empty();
+        $('#pre_support_text').empty();
+        $('#cnt_support_img').empty();
+        $('#pre_support_img').empty();
+        $("#cnt_query_img").attr("src","static/img/black.jpg");
+        $("#pre_query_img").attr("src","static/img/black.jpg");
+        $.ajax({
+            url: '/reset',
+            method: "POST",
+        }).done(function (res){
+
+        });
+
+    });
 
 });

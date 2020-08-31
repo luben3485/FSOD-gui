@@ -83,7 +83,9 @@
             <div class="col-3">
 
                 <button class="button button-primary  button-block button-large" id="query_image" >Take a photo (query image)</button>
-                <button class="button button-primary  button-block button-large" id="take_a_shot" >Add a shot (support image)</button>
+                <button class="button button-primary  button-block button-large" id="add_a_shot" >Add a shot (support image)</button>
+                <button class="button button-primary  button-block button-large" id="inference_model" >Inference model</button>
+                <button class="button button-primary  button-block button-large" id="reset" >Reset</button>
 
             </div>
         </div>
@@ -107,11 +109,12 @@
             </button>
           </div>
           <div class="modal-body">
-              <img id="shot_img" height="450" width="450">
+              <img id="shot_img_1" height="450" width="450">
+              <img id="shot_img_2" height="450" width="450">
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary"  id="support_image" >add this shot</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+<!--            <button type="button" class="btn btn-primary"  id="support_image" >add this shot</button>-->
           </div>
         </div>
       </div>
