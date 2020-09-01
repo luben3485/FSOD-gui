@@ -2,3 +2,8 @@
 /datasets
 /output
 /static/img/data/query_set
+/lib/datasets/
+/lib/model
+/lib/roi_data_layer
+/lib/pycocotools
+/lib/build
