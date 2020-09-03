@@ -144,7 +144,7 @@ def run_model(support_im_paths,query_path,cnt_shot,output_path_folder):
     # model
     cfg_from_list(['ANCHOR_SCALES', '[4, 8, 16, 32]', 'ANCHOR_RATIOS', '[0.5,1,2]'])
     model_dir = os.path.join(CWD, 'models')
-    load_path = os.path.join(model_dir,'faster_rcnn_{}_{}_{}.pth'.format(1, 11, 34467))
+    load_path = os.path.join(model_dir,'faster_rcnn_{}_{}_{}.pth'.format(1, 24, 4136))
 
     model = get_model('multi', load_path, n_shot)
 

@@ -1,4 +1,46 @@
 $( document ).ready(function() {
+    const sound = document.getElementsByTagName('audio')[0]
+
+    var canvas = document.getElementById('cnt_query_img_canvas');
+    var ctx = canvas.getContext('2d');
+    var x = 0;
+    var y = 0;
+    var width = 500;
+    var height = 500;
+    var imageObj = new Image();
+
+    var elemLeft = canvas.offsetLeft + canvas.clientLeft;
+    var elemTop = canvas.offsetTop + canvas.clientTop;
+    var elements = [];
+
+    // Add event listener for `click` events.
+    canvas.addEventListener('click', function(event) {
+        console.log('clicked!');
+        var x = event.pageX - elemLeft,
+            y = event.pageY - elemTop;
+            console.log(x,y)
+            console.log(event.pageX,event.pageY);
+            console.log(elemLeft,elemTop);
+
+        // Collision detection between clicked offset and element.
+        elements.forEach(function(element) {
+            //console.log(element);
+
+            if (y > element.top && y < element.top + element.height
+                && x > element.left && x < element.left + element.width) {
+                alert('clicked an element');
+            }
+        });
+
+    }, false);
+
+
+
+    imageObj.onload = function() {
+        ctx.drawImage(imageObj, x, y, width, height);
+    };
+    imageObj.src = 'static/img/black.jpg';
+
 
     $( "#support_image" ).click(function() {
         $.ajax({
@@ -86,7 +128,7 @@ $( document ).ready(function() {
             method: "POST",
         }).done(function (res){
 
-        }
+
             //empty the text div
             $('#cnt_support_text').empty();
             $('#pre_support_text').empty();
@@ -104,6 +146,7 @@ $( document ).ready(function() {
             }
 
         });
+    });
 
     $( "#reset" ).click(function() {
         $('#cnt_support_text').empty();
@@ -120,5 +163,99 @@ $( document ).ready(function() {
         });
 
     });
+
+    $( "#show" ).click(function() {
+
+
+        $.ajax({
+            url: '/show',
+            method: "POST",
+        }).done(function (res){
+            $('#cameraModal').modal('show');
+            black = 'static/img/black.jpg';
+            var path = res.support_im_path
+            var i;
+            for (i = 0; i < path.length; i++) {
+                (function(index){
+                    setTimeout(function(){
+                        $('#shot_img_1').css('opacity','0');
+                        $('#shot_img_2').css('opacity','0');
+                    },0);
+                    setTimeout(function(){
+                        sound.play()
+                        $('#shot_img_1').css('opacity','1');
+                        $('#shot_img_2').css('opacity','1');
+                        $('#shot_img_2').attr('src',path[index]);
+                        $('#shot_img_1').attr('src',black);
+                        $('#shot_1').css('z-index','0');
+                        $('#shot_2').css('z-index','1');
+                    },1000*(index+1)-50);
+                    setTimeout(function(){
+                        $('#shot_1').css('z-index','2');
+
+                    },1000*(index+1));
+                    setTimeout(function(){
+                         $('#shot_1').css('z-index','0');
+
+                    },1000*(index+1)+50);
+
+                })(i);
+            }
+
+
+        });
+
+
+    });
+
+    $( "#select_bbox_test" ).click(function() {
+
+        $.ajax({
+            url: '/select_bbox_test',
+            method: "POST",
+        }).done(function (res){
+            console.log(res.bbox);
+            console.log(res.query_path)
+            //$("#cnt_query_img").attr("src",res.query_path);
+
+            var imageObj = new Image();
+            imageObj.onload = function() {
+                ctx.drawImage(imageObj, x, y, width, height);
+                var bbox = res.bbox
+                bbox.forEach((el,index)=>{
+                    ctx.beginPath();
+                    ctx.lineWidth = "6";
+                    ctx.strokeStyle = "red";
+                    x = el[0];
+                    y = el[1];
+                    w = el[2] - el[0];
+                    h = el[3] - el[1];
+                    ctx.rect(x, y, w, h);
+                    ctx.stroke();
+
+                    // Add element.
+                    elements.push({
+                        width: w,
+                        height: h,
+                        top: x,
+                        left: y
+                    });
+
+                });
+
+            };
+            imageObj.src = res.query_path;
+
+
+
+
+
+
+
+
+        });
+
+    });
+
 
 });

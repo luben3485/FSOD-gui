@@ -6,6 +6,7 @@
   <title>FSOD-web-demo</title>
 <!-- Bootstrap CSS -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
 </head>
@@ -59,7 +60,8 @@
 <!--                {% else %}-->
 <!--                <img  src="static/img/black.jpg" id="cnt_query_img" height="500" width="500">-->
 <!--                {% endif %}-->
-                <img  src="static/img/black.jpg" id="cnt_query_img" height="500" width="500">
+<!--                <img  src="static/img/black.jpg" id="cnt_query_img" height="500" width="500">-->
+                    <canvas id="cnt_query_img_canvas" width="500" height="500"></canvas>
             </div>
 
             <div class="col-xl-2">
@@ -82,9 +84,10 @@
         <div class="row justify-content-center" style="padding-top:8vh;">
             <div class="col-3">
 
-                <button class="button button-primary  button-block button-large" id="query_image" >Take a photo (query image)</button>
-                <button class="button button-primary  button-block button-large" id="add_a_shot" >Add a shot (support image)</button>
-                <button class="button button-primary  button-block button-large" id="inference_model" >Inference model</button>
+<!--                <button class="button button-primary  button-block button-large" id="query_image" >Take a photo (query image)</button>-->
+<!--                <button class="button button-primary  button-block button-large" id="add_a_shot" >Add a shot (support image)</button>-->
+                <button class="button button-primary  button-block button-large" id="show" >take a shot (support image)</button>
+                <button class="button button-primary  button-block button-large" id="select_bbox_test" >Inference </button>
                 <button class="button button-primary  button-block button-large" id="reset" >Reset</button>
 
             </div>
@@ -108,9 +111,14 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">
-              <img id="shot_img_1" height="450" width="450">
-              <img id="shot_img_2" height="450" width="450">
+          <div class="modal-body ">
+              <div id="shot_1">
+                  <img id="shot_img_1" height="450" width="450">
+              </div>
+              <div id="shot_2">
+                  <img id="shot_img_2" height="450" width="450">
+              </div>
+
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -119,7 +127,7 @@
         </div>
       </div>
     </div>
-
+    <audio src="https://raw.githubusercontent.com/mahmoudZakaria90/myCodePenStuff/master/audio/camera-shutter-click-03.mp3"></audio>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" ></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" ></script>

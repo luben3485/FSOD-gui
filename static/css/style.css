@@ -29,7 +29,7 @@ body {
 
 .h1 { font-size:2rem; color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.3); letter-spacing:1px; text-align:center; }
 
-#pre_query_img ,#cnt_query_img{ border-radius: 4%; border:5px solid white}
+#pre_query_img ,#cnt_query_img,#cnt_query_img_canvas{ border-radius: 4%; border:5px solid white}
 img:not(#pre_query_img):not(#cnt_query_img){padding:10px;}
 /*.text{ border-bottom:1px #FFF solid; padding-bottom:5px; margin:10px;}*/
 .row{
@@ -47,3 +47,44 @@ button{
 .modal-title{
     color:black;
 }
+
+.modal-body
+{
+ position: relative;
+ min-height: 480px;
+}
+#shot_1, #shot_2{
+    position:absolute;
+    left:23px;
+    height:450px;
+    width:450px;
+}
+
+
+/*
+#shot_img_1{
+ animation:fade 8s infinite;
+
+
+}
+
+#shot_img_2{
+ animation:fade2 8s infinite;
+}
+.flash{
+    animation:fade 2s ;
+}
+@keyframes fade
+{
+  0%   {opacity:1}
+  33.333% { opacity: 1}
+  66.666% { opacity: 0}
+  100% { opacity: 0}
+}
+@keyframes fade2
+{
+  0%   {opacity:0}
+  33.333% { opacity: 0}
+  66.666% { opacity: 1 }
+  100% { opacity: 1}
+}*/

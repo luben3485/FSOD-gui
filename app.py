@@ -10,7 +10,7 @@ import subprocess
 import cv2
 
 import base64
-#import run_one_im
+import run_one_im
 from pathlib import Path
 import os
 import io
@@ -179,7 +179,7 @@ def inference_model():
 
     output_path_folder = 'static/img/data/result'
     support_root_dir = 'static/img/data/support'
-    class_dir = 'support_set'
+    class_dir = 'mug'
 
 
     cnt_shot += 1
@@ -188,6 +188,15 @@ def inference_model():
     cnt_support_im_paths = []
     for i in range(1,cnt_shot+1):
         cnt_support_im_paths.append(os.path.join(support_root_dir, class_dir, str(i)+'.jpg'))
+
+
+    # #test
+    # cnt_support_im_paths = []
+    # for file in os.listdir(os.path.join(support_root_dir,class_dir)):
+    #     if file.endswith(".jpg"):
+    #         file_path = os.path.join(support_root_dir,class_dir,file)
+    #         cnt_support_im_paths.append(file_path)
+
 
     pre_support_im_paths = cnt_support_im_paths[:-1]
 
@@ -209,11 +218,32 @@ def inference_model():
     }
     return jsonify(response)
 
+@app.route('/select_bbox_test',methods=['POST','GET'])
+def select_bbox_test():
+    #xmin ymin xmax ymax
+    bbox = [
+        [100,100,200,200],
+        [250,150,350,400]]
+    response = {
+        'bbox':bbox,
+        'query_path':query_path
+    }
+
+    return jsonify(response)
+
 @app.route('/reset',methods=['POST','GET'])
 def reset():
     global cnt_shot
     cnt_shot = 0
     return jsonify({'msg':'success'})
+
+@app.route('/show',methods=['POST','GET'])
+def show():
+    import time
+    time.sleep(5)
+    path = ['static/img/sea1.jpg','static/img/sea2.jpg','static/img/sea1.jpg','static/img/sea2.jpg','static/img/sea1.jpg'];
+    return jsonify({'support_im_path':path})
+
 
 
 def rotate(image, angle, center=None, scale=1.0):
