@@ -9,23 +9,28 @@ $( document ).ready(function() {
     var height = 500;
     var imageObj = new Image();
 
-    var elemLeft = canvas.offsetLeft + canvas.clientLeft;
-    var elemTop = canvas.offsetTop + canvas.clientTop;
+    //get canvas tag position
+    var element = document.getElementById('cnt_query_img_canvas');
+    var elemLeft = 0;
+    var elemTop = 0;
+
+    while ( element ) {
+        elemLeft += element.offsetLeft - element.scrollLeft + element.clientLeft;
+        elemTop += element.offsetTop - element.scrollLeft + element.clientTop;
+        element = element.offsetParent;
+    }
     var elements = [];
+
 
     // Add event listener for `click` events.
     canvas.addEventListener('click', function(event) {
-        console.log('clicked!');
         var x = event.pageX - elemLeft,
             y = event.pageY - elemTop;
-            console.log(x,y)
-            console.log(event.pageX,event.pageY);
-            console.log(elemLeft,elemTop);
+            //console.log(x,y);
 
         // Collision detection between clicked offset and element.
         elements.forEach(function(element) {
             //console.log(element);
-
             if (y > element.top && y < element.top + element.height
                 && x > element.left && x < element.left + element.width) {
                 alert('clicked an element');
